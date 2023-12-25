@@ -50,6 +50,43 @@ const registerNewUser = async (req, res) => {
      }
 }
 
+// Controller Login User
+const loginUser = async (req, res) => {
+     const { email, password } = req.body;
+
+     if (!email || !password) {
+          return res.status(400).json({
+               error: 'All must be filled'
+          });
+     }
+
+     try {
+          const checkUser = await prisma.user.findUnique({
+               where: { email },
+          });
+
+          if (!checkUser) {
+               res.status(400).json({ error: 'Wrong email or password' });
+          }
+
+          const passwordMatch = await bcrypt.compare(password, checkUser.password);
+
+          if (passwordMatch) {
+               // Token JWT Login User
+               const token = jwt.sign({ userId: checkUser.id }, secretKey, { expiresIn: '1h' });
+
+               res.json({ message: 'Login successful', checkUser, token });
+          } else {
+               return res.status(401).json({ error: 'Wrong email or password' });
+          }
+
+     } catch (error) {
+          console.log("Login failed", error);
+          res.status(500).json({ error: 'Internal server error' });
+     }
+}
+
 module.exports = {
      registerNewUser,
+     loginUser,
 }
