@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 // Import Function Controller
-const { registerNewUser } = require("../controller/user.controller");
+const { registerNewUser, loginUser } = require("../controller/user.controller");
 
 // Router Register
 router.post('/register', registerNewUser);
 
 // Router Login
-// router.post('/login', nameController);
+router.get('/login', loginUser);
 
 module.exports = router;
