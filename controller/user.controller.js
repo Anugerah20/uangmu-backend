@@ -86,7 +86,30 @@ const loginUser = async (req, res) => {
      }
 }
 
+// Show Data User
+const showDataUser = async (req, res) => {
+     const { id } = req.params;
+     const newUser = await prisma.user.findUnique({
+          where: {
+               id,
+          },
+     });
+
+     if (newUser) {
+          res.json({
+               id: newUser.id,
+               email: newUser.email,
+               fullname: newUser.fullname,
+          });
+     } else {
+          res.status(400).json({
+               error: "User not found",
+          });
+     }
+}
+
 module.exports = {
      registerNewUser,
      loginUser,
+     showDataUser
 }
