@@ -66,9 +66,9 @@ const authenticationToken = (req, res, next) => {
           next();
 
      } catch (error) {
-          console.log('Token Verification Error:', error.message);
-          return res.status(401).json({
-               message: "Unauthorized: Invalid Token"
+          console.log('Server Error', error.message);
+          return res.status(500).json({
+               message: "Internal server error during token verification"
           });
      }
 };
