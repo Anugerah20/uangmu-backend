@@ -127,6 +127,8 @@ const showDataUser = async (req, res) => {
                id: newUser.id,
                email: newUser.email,
                fullname: newUser.fullname,
+               bio: newUser.bio,
+               joinedAt: newUser.joinedAt
           });
      } else {
           res.status(404).json({
@@ -146,6 +148,7 @@ const getEditDataUser = async (req, res) => {
                     id: true,
                     fullname: true,
                     email: true,
+                    bio: true,
                }
           });
 
