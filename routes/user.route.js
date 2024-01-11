@@ -1,9 +1,16 @@
 const express = require("express");
 const router = express.Router();
+const Multer = require("multer");
 
 // Import Function Controller
 const { authenticationToken } = require("../middleware/protect.middleware");
-const { registerNewUser, loginUser, showDataUser, getEditDataUser, checkToken } = require("../controller/user.controller");
+const { registerNewUser, loginUser, showDataUser, getEditDataUser, checkToken, editDataUserById } = require("../controller/user.controller");
+
+// Multer Upload Image
+const storage = new Multer.memoryStorage();
+const upload = Multer({
+     storage,
+})
 
 // Router Register
 router.post('/register', registerNewUser);
@@ -19,6 +26,9 @@ router.get("/edit-profil/:id", authenticationToken, getEditDataUser);
 
 // Route Check Token
 router.get("/check-token", authenticationToken, checkToken);
+
+// Route Edit Profile User
+router.put("/edit-profil/:id", authenticationToken, upload.single("file"), editDataUserById);
 
 
 module.exports = router;
