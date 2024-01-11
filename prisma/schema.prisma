@@ -16,6 +16,7 @@ model User {
   fullname String?
   password String
   bio      String?
+  image String?
   joinedAt DateTime @default(now())
   token_reset_password String?
 }
