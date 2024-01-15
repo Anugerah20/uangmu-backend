@@ -30,5 +30,4 @@ router.get("/check-token", authenticationToken, checkToken);
 // Route Edit Profile User
 router.put("/edit-profil/:id", authenticationToken, upload.single("file"), editDataUserById);
 
-
 module.exports = router;

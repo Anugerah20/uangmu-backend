@@ -239,10 +239,8 @@ const editDataUserById = async (req, res) => {
                // Use buffers from files to create URI data
                const b64 = Buffer.from(req.file.buffer).toString("base64");
                const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
-
                // Upload Image Cloudinary
                imageUrl = await uploadImage(dataURI);
-               // console.log("Image URL: ", imageUrl);
           }
 
      } catch (error) {
@@ -255,7 +253,7 @@ const editDataUserById = async (req, res) => {
                data: {
                     fullname,
                     bio,
-                    image: imageUrl
+                    ...(imageUrl && { image: imageUrl })
                }
           });
 
