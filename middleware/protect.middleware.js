@@ -44,26 +44,23 @@ const authenticationToken = (req, res, next) => {
      if (!token) {
           console.log("Token Not Found");
           return res.status(401).json({
-               message: "Unauthorized: Missing Token"
+               message: "No Token!"
           });
      }
 
      const splitToken = token.split(' ')[1];
-     console.log("Split Token: ", splitToken);
 
      try {
           const resultToken = jwt.verify(splitToken, process.env.JWT_SECRET);
 
-          if (!resultToken) {
+          if (!resultToken.userId) {
                return res.status(401).json({
                     message: "No Authorized"
                });
+          } else {
+               console.log("Token Verified Successfully");
+               next();
           }
-
-          req.decodedToken = resultToken;
-
-          console.log("Token Verified Successfully");
-          next();
 
      } catch (error) {
           console.log('Server Error', error.message);
