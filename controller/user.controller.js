@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const { default: axios } = require("axios");
 
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
@@ -67,7 +68,7 @@ const loginUser = async (req, res) => {
           });
 
           if (!checkUser) {
-               res.status(400).json({ error: "Wrong email or password" });
+               res.status(400).json({ error: "Wrong email address" });
           }
 
           const passwordMatch = await bcrypt.compare(password, checkUser.password);
@@ -78,7 +79,7 @@ const loginUser = async (req, res) => {
 
                res.json({ message: "Login successful", checkUser, token });
           } else {
-               return res.status(401).json({ error: "Wrong email or password: ", error });
+               return res.status(401).json({ error: "Wrong password" });
           }
 
      } catch (error) {
@@ -87,11 +88,80 @@ const loginUser = async (req, res) => {
      }
 }
 
-// Check Token
-const checkToken = async (req, res) => {
-     const { token } = req.body;
+// Send email user forgot password
+const sendEmailUserForgotPassword = async (nama, token, email) => {
+     let data = {
+          service_id: process.env.EMAILJS_SERVICE_ID,
+          template_id: process.env.EMAILJS_TEMPLATE_ID,
+          user_id: process.env.EMAILJS_USER_ID,
+          template_params: {
+               "nama": nama,
+               "token": token,
+               "email": email,
+          },
+          "accessToken": process.env.EMAILJS_ACCESS_TOKEN,
+     };
 
      try {
+          await axios.post("https://api.emailjs.com/api/v1.0/email/send", data);
+          return true;
+
+     } catch (error) {
+          console.log("Error send email js: ", error);
+          return false;
+     }
+}
+
+// Forgot Password
+const forgotPassword = async (req, res) => {
+     const { email } = req.body;
+
+     // Check email user
+     const checkUser = await prisma.user.findUnique({
+          where: { email },
+     });
+
+     console.log("Check email user: ", checkUser);
+
+     if (checkUser) {
+          const resetTokenPassword = jwt.sign({ userId: checkUser.id }, secretKey, { expiresIn: '1h' });
+
+          console.log("Reset token password: ", resetTokenPassword)
+
+          await prisma.user.update({
+               where: { email },
+               data: {
+                    token_reset_password: resetTokenPassword,
+               },
+          });
+
+          const response = await sendEmailUserForgotPassword(checkUser.fullname, resetTokenPassword, checkUser.email);
+
+          console.log("Email response: ", response);
+
+          if (response) {
+               return res.status(200).json({ message: "Email Send Successfully" });
+
+          } else {
+               return res.status(400).json({ message: "Email Failed Send" });
+          }
+
+     } else if (!checkUser) {
+          return res.status(400).json({ error: "Email Not Registered" });
+     }
+}
+
+// Check Token
+const checkToken = async (req, res) => {
+     const { token } = req.params;
+
+     try {
+          if (!token) {
+               return res.status(400).json({
+                    message: "Token Not Found"
+               });
+          }
+
           const decode = jwt.verify(token, process.env.JWT_SECRET);
 
           // Check user has token
@@ -100,6 +170,13 @@ const checkToken = async (req, res) => {
                     id: decode.userId
                },
           });
+
+          if (!user.token_reset_password) {
+               return res.status(200).json({
+                    message: "Token Invalid",
+                    status: false,
+               });
+          }
 
           if (user) {
                return res.status(201).json({
@@ -111,6 +188,41 @@ const checkToken = async (req, res) => {
           return res.status(401).json({
                message: "Token Invalid",
           });
+     }
+}
+
+// Update password
+const updatePassword = async (req, res) => {
+     const { userId, password } = req.body;
+
+     try {
+          const user = await prisma.user.findUnique({
+               where: { id: userId },
+          });
+
+          if (!user) {
+               return res.status(400).json({ error: "User Not Found!" });
+          }
+
+          const saltRounds = 10;
+          const hashedNewPassword = await bcrypt.hash(password, saltRounds);
+
+          await prisma.user.update({
+               where: { id: userId },
+               data: {
+                    password: hashedNewPassword,
+                    token_reset_password: null,
+               },
+          });
+
+          res.json({
+               status: true,
+               message: "Password Updated Successfully"
+          });
+
+     } catch (error) {
+          console.log(error);
+          res.status(400).json({ error: "Password Updated Failed" });
      }
 }
 
@@ -147,34 +259,6 @@ const showDataUser = async (req, res) => {
           });
      }
 }
-
-
-// Show Data User
-// const showDataUser = async (req, res) => {
-//      const { id } = req.params;
-//      const newUser = await prisma.user.findUnique({
-//           where: {
-//                id,
-//           },
-//      });
-
-//      if (newUser) {
-//           res.status(201).json({
-//                id: newUser.id,
-//                email: newUser.email,
-//                fullname: newUser.fullname,
-//                bio: newUser.bio,
-//                image: newUser.image,
-//                joinedAt: newUser.joinedAt
-//           });
-
-//      } else {
-//           res.status(404).json({
-//                error: "User not found",
-//           });
-//      }
-// }
-
 
 // Get Edit User By Id
 const getEditDataUser = async (req, res) => {
@@ -232,7 +316,7 @@ const editDataUserById = async (req, res) => {
      const { fullname, bio } = req.body;
      let imageUrl = "";
 
-     console.log(req.body);
+     // console.log(req.body);
 
      try {
           if (req.file) {
@@ -281,6 +365,8 @@ module.exports = {
      loginUser,
      showDataUser,
      getEditDataUser,
+     forgotPassword,
      checkToken,
+     updatePassword,
      editDataUserById
 }
