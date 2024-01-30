@@ -4,6 +4,6 @@ cloudinary.config({
      secure: true,
 });
 
-console.log(cloudinary.config());
+// console.log(cloudinary.config());
 
 module.exports = cloudinary;
