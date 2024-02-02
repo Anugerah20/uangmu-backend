@@ -59,6 +59,8 @@ const authenticationToken = (req, res, next) => {
                });
           } else {
                console.log("Token Verified Successfully");
+
+               req.user = { id: resultToken.userId };
                next();
           }
 
