@@ -1,4 +1,5 @@
 const express = require("express");
+const noteRoute = require("./routes/note.route");
 const cors = require("cors");
 const userRoute = require("./routes/user.route")
 const bodyParser = require("body-parser");
@@ -33,6 +34,7 @@ app.get('/', (req, res) => {
 
 // Route User Register & Login
 app.use('/user', userRoute);
+app.use('/user', noteRoute);
 
 // Run Server
 app.listen(port, () => {
