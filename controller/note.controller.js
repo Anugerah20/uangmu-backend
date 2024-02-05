@@ -40,9 +40,7 @@ const getNoteById = async (req, res) => {
           });
 
           if (!showNotes) {
-               return res.status(404).json({
-                    message: 'User ID Not Found'
-               });
+               throw Error('UserId Not Found');
           }
 
           res.status(201).json({
@@ -72,9 +70,7 @@ const editNoteById = async (req, res) => {
 
           // Check Note By ID
           if (!CheckUserId) {
-               return res.status(404).json({
-                    error: 'UserId Not Found'
-               });
+               throw Error('UserId Not Found');
           }
 
           const editNote = await prisma.note.update({
@@ -101,7 +97,39 @@ const editNoteById = async (req, res) => {
           });
 
      } catch (error) {
-          console.log(error)
+          console.log(error);
+          res.status(500).json({ error: 'Internal server error' });
+     }
+}
+
+const deleteNoteById = async (req, res) => {
+     const { userId } = req.params;
+
+     try {
+          const checkUserId = await prisma.note.findFirst({
+               where: {
+                    userId
+               }
+          });
+
+          // Cek apakah userId ada atau tidak
+          if (!checkUserId) {
+               throw Error('UserId Not Found');
+          }
+
+          const deleteNote = await prisma.note.delete({
+               where: {
+                    id: checkUserId.id
+               }
+          });
+
+          return res.status(201).json({
+               deleteNote,
+               message: 'Delete Note Success'
+          });
+
+     } catch (error) {
+          console.log(error);
           res.status(500).json({ error: 'Internal server error' });
      }
 }
@@ -110,4 +138,5 @@ module.exports = {
      createNote,
      getNoteById,
      editNoteById,
+     deleteNoteById
 }
