@@ -43,7 +43,7 @@ const registerNewUser = async (req, res) => {
           });
 
           // JWT Token Register User
-          const token = jwt.sign({ userId: newUser.id }, secretKey, { expiresIn: "1h" });
+          const token = jwt.sign({ userId: newUser.id }, secretKey, { expiresIn: "1d" });
           res.json({ message: "Register Successful", user: newUser, token });
 
      } catch (error) {
@@ -75,7 +75,7 @@ const loginUser = async (req, res) => {
 
           if (passwordMatch) {
                // Token JWT Login User
-               const token = jwt.sign({ userId: checkUser.id }, secretKey, { expiresIn: "1h" });
+               const token = jwt.sign({ userId: checkUser.id }, secretKey, { expiresIn: "1d" });
 
                res.json({ message: "Login successful", checkUser, token });
           } else {
@@ -124,7 +124,7 @@ const forgotPassword = async (req, res) => {
      console.log("Check email user: ", checkUser);
 
      if (checkUser) {
-          const resetTokenPassword = jwt.sign({ userId: checkUser.id }, secretKey, { expiresIn: '1h' });
+          const resetTokenPassword = jwt.sign({ userId: checkUser.id }, secretKey, { expiresIn: '1d' });
 
           console.log("Reset token password: ", resetTokenPassword)
 
