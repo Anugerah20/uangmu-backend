@@ -33,9 +33,9 @@ const getNoteById = async (req, res) => {
      const { userId } = req.params;
 
      try {
-          const showNotes = await prisma.note.findFirst({
+          const showNotes = await prisma.note.findMany({
                where: {
-                    userId
+                    userId,
                }
           });
 
