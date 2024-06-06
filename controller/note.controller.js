@@ -28,28 +28,59 @@ const createNote = async (req, res) => {
      }
 }
 
-// Menampilkan catatan bedasarkan ID
+// Menampilkan catatan bedasarkan ID User
 const getNoteById = async (req, res) => {
+     // Proses membuat pagination di note controller
      const { userId } = req.params;
+     const { page, limit } = req.query;
 
      try {
+          // Menghitung jumlah data note berdasarkan userId
+          // skip untuk melewati data
+          const skip = (page - 1) * limit;
+
+          // Take buat menampilkan data
+          const take = parseInt(limit);
+
+          // Menampilkan data note berdasarkan userId dengan pagination
           const showNotes = await prisma.note.findMany({
                where: {
                     userId,
+               },
+               skip,
+               take,
+               orderBy: {
+                    id: 'desc'
                }
           });
 
-          if (!showNotes) {
-               throw Error('UserId Not Found');
+          // Kondisi jika showNotes tidak ditemukan berdasarkan userId
+          if (!showNotes || showNotes.length === 0) {
+               throw new Error('UserId Not Found');
           }
+
+          // Menghitung total catatan untuk userId tertentu
+          const totalNotes = await prisma.note.count({
+               where: {
+                    userId,
+               },
+          });
+
+          // Menghitung total halaman yang ada
+          totalPages = Math.ceil(totalNotes / limit)
+
+          // Mengubah currentPage menjadi bilangan integer
+          currentPage = parseInt(page)
 
           res.status(201).json({
                showNotes,
+               totalPages,
+               currentPage,
                message: 'Success show note by id'
           });
 
      } catch (error) {
-          console.log(error)
+          console.log(error);
           res.status(500).json({ error: 'Internal Server Error' });
      }
 }
