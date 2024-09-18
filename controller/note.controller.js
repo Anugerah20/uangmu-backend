@@ -28,11 +28,12 @@ const createNote = async (req, res) => {
      }
 }
 
+
 // Menampilkan catatan bedasarkan ID User
 const getNoteById = async (req, res) => {
      // Proses membuat pagination di note controller
      const { userId } = req.params;
-     const { page, limit } = req.query;
+     const { page = 1, limit = 3 } = req.query;
 
      try {
           // Menghitung jumlah data note berdasarkan userId
