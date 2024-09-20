@@ -28,12 +28,40 @@ const createNote = async (req, res) => {
      }
 }
 
+// Menampilkan semua catatan
+const getAllNote = async (req, res) => {
+     const { userId } = req.params;
+
+     try {
+          const showAllNotes = await prisma.note.findMany({
+               where: {
+                    userId
+               }
+          });
+
+          // Kondisi jika All Notes tidak ditemukan berdasarkan userId
+          if (!getAllNote || getAllNote.length === 0) {
+               throw new Error('UserId Not Found');
+          }
+
+          res.status(201).json({
+               showAllNotes,
+               message: 'Success show all notes'
+          });
+
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({ error: 'Internal Server Error' });
+     }
+}
+
 
 // Menampilkan catatan bedasarkan ID User
 const getNoteById = async (req, res) => {
      // Proses membuat pagination di note controller
      const { userId } = req.params;
-     const { page = 1, limit = 3 } = req.query;
+
+     let { page, limit } = req.query;
 
      try {
           // Menghitung jumlah data note berdasarkan userId
@@ -170,5 +198,6 @@ module.exports = {
      createNote,
      getNoteById,
      editNoteById,
-     deleteNoteById
+     deleteNoteById,
+     getAllNote
 }
