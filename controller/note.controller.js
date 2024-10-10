@@ -115,27 +115,85 @@ const getNoteById = async (req, res) => {
 }
 
 // Edit Catatan Bedasarkan ID User
+// const editNoteById = async (req, res) => {
+// const { userId, id } = req.params;
+//      const { userId } = req.params;
+
+// console.log("ID ID: ", id);
+
+//      const { description, date, price, noteType } = req.body;
+
+//      try {
+//           const CheckUserId = await prisma.note.findFirst({
+//                where: {
+//                     userId
+// id
+//                },
+//           });
+//           console.log(CheckUserId);
+
+// Check Note By ID
+//           if (!CheckUserId) {
+// throw Error('UserId Not Found');
+//                throw Error('ID Not Found');
+//           }
+
+//           const editNote = await prisma.note.update({
+//                where: {
+//                     id: CheckUserId.id
+// id
+//                },
+//                data: {
+//                     description,
+//                     date,
+//                     price,
+//                     noteType
+//                }
+//           });
+
+//           if (!editNote) {
+//                return res.status(401).json({
+//                     error: 'Edit Note Failed'
+//                });
+//           }
+
+// Check User ID
+//           if (editNote.userId !== userId) {
+//                return res.status(401).json({ error: 'Unauthorized: user id no match' });
+//           }
+
+//           res.status(201).json({
+//                editNote,
+//                message: 'Edit Note Success'
+//           });
+
+//      } catch (error) {
+//           console.log(error);
+//           res.status(500).json({ error: 'Internal server error' });
+//      }
+// }
+
 const editNoteById = async (req, res) => {
-     const { userId } = req.params;
+     const { userId, id } = req.params;
 
      const { description, date, price, noteType } = req.body;
 
      try {
-          const CheckUserId = await prisma.note.findFirst({
+          // Cek catatan berdasarkan userId dan id
+          const note = await prisma.note.findFirst({
                where: {
-                    userId
+                    userId,
+                    id
                },
           });
-          console.log(CheckUserId);
 
-          // Check Note By ID
-          if (!CheckUserId) {
-               throw Error('UserId Not Found');
+          if (!note) {
+               throw Error('ID Not Found');
           }
 
           const editNote = await prisma.note.update({
                where: {
-                    id: CheckUserId.id
+                    id: note.id
                },
                data: {
                     description,
@@ -151,6 +209,11 @@ const editNoteById = async (req, res) => {
                });
           }
 
+          // Check User ID
+          if (editNote.userId !== userId) {
+               return res.status(401).json({ error: 'Unauthorized: user id no match' });
+          }
+
           res.status(201).json({
                editNote,
                message: 'Edit Note Success'
@@ -161,6 +224,7 @@ const editNoteById = async (req, res) => {
           res.status(500).json({ error: 'Internal server error' });
      }
 }
+
 
 const deleteNoteById = async (req, res) => {
      const { userId } = req.params;
