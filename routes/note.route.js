@@ -15,7 +15,8 @@ router.get('/get-note/:userId', getNoteById);
 router.get('/get-all-note/:userId', authenticationToken, getAllNote);
 
 // Route Edit Note By ID
-router.put('/edit-note/:userId', authenticationToken, editNoteById);
+router.put('/edit-note/:userId/:id', authenticationToken, editNoteById);
+// router.put('/edit-note/:id', authenticationToken, editNoteById);
 
 // Route Delete Note By ID
 router.delete('/delete-note/:userId', deleteNoteById);
