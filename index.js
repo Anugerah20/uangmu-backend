@@ -1,7 +1,9 @@
 const express = require("express");
+// Khusus untuk route user, note, dan contact
 const noteRoute = require("./routes/note.route");
+const userRoute = require("./routes/user.route");
+const contactRoute = require("./routes/contact.route");
 const cors = require("cors");
-const userRoute = require("./routes/user.route")
 const bodyParser = require("body-parser");
 const multer = require('multer');
 const upload = multer();
@@ -35,6 +37,7 @@ app.get('/', (req, res) => {
 // Route User Register & Login
 app.use('/user', userRoute);
 app.use('/user', noteRoute);
+app.use('/user', contactRoute);
 
 // Run Server
 app.listen(port, () => {

@@ -10,6 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// Membuat model user yang berelasi dengan model note dan contact
 model User {
   id  String @id @default(uuid())
   email String @unique
@@ -20,8 +21,10 @@ model User {
   joinedAt DateTime @default(now())
   token_reset_password String?
   notes Note[]
+  contacts Contact[]
 }
 
+/// Membuat model note yang berelasi dengan model user
 model Note {
   id String @id @default(uuid())
   description String
@@ -37,4 +40,16 @@ model Note {
 enum NoteType {
   Pemasukan
   Pengeluaran
+}
+
+/// Membuat model contact yang berelasi dengan model user
+model Contact {
+  id String @id @default(uuid())
+  fullname String
+  email String
+  message String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  userId String?
+  user User? @relation(fields: [userId], references: [id])
 }
