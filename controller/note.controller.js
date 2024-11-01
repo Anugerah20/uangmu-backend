@@ -61,7 +61,7 @@ const getNoteById = async (req, res) => {
      // Proses membuat pagination di note controller
      const { userId } = req.params;
 
-     let { page = 1, limit = 1 } = req.query;
+     let { page = 1, limit = 2 } = req.query;
 
      try {
           // Menghitung jumlah data note berdasarkan userId
