@@ -8,6 +8,11 @@ const { sendContact, showAllContact } = require('../controller/contact.controlle
 // Route Create Note
 router.post('/contact', authenticationToken, sendContact);
 
+// Nabil 27/12/2024
+// New Router Create Contact no authenticationToken
+// router.post('/contact', sendContact);
+
+
 // Route Show all contact
 router.get('/contact/:userId', authenticationToken, showAllContact);
 
